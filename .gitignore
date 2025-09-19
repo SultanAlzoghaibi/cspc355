@@ -1,0 +1,37 @@
+# Build output
+cmake-build-*/
+build/
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dll
+*.dylib
+
+# CLion / JetBrains IDE files
+.idea/
+*.iml
+
+# MacOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Linux / Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs
+*.log
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+CTestTestfile.cmake
+cmake_install.cmake
+Makefile

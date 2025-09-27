@@ -3,6 +3,19 @@ project(cspc355notes C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(cspc355notes
+# Assignment 1 target
+add_executable(A1
+        A1/main1.c
         copy.c
-        A1/main.c)
+)
+
+# Assignment 2 target
+add_executable(A2
+        A2/main.c
+        copy.c
+)
+
+# (Optional) Assembly example
+add_executable(assembly
+        assembly/main.S
+)

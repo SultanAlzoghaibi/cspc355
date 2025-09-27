@@ -1,0 +1,16 @@
+Double search for bamboo types 3 and 4
+(0,2) -> type 3
+(1,2) -> type 4
+(2,0) -> type 3
+(3,3) -> type 3
+Bamboo 3 percentage: 18.75%
+Bamboo 4 percentage: 6.25%
+
+Double search for bamboo types 3 and 4
+(0,2) -> type 3
+(1,2) -> type 4
+(2,0) -> type 3
+(3,3) -> type 3
+Bamboo 3 percentage: 18.75%
+Bamboo 4 percentage: 6.25%
+

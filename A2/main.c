@@ -7,7 +7,7 @@
 #include <string.h>
 
 int initialCapacityOfArrayList = 32;
-int printNumber = 5;
+int printNumber = 10;
 struct shipment {
     int type;
     int amount;
@@ -110,24 +110,30 @@ void deleteShipment(struct shipmentArrayList *shipmentlogs, int rangeS, int rang
 
     //printf("BEFORE\n");
     //printShipmentLogs(*shipmentlogs);
-
+    // im shifting the array after teh cut off to the beinning of the cut off
     memmove(&shipmentlogs->shipments[rangeS],
          &shipmentlogs->shipments[rangeE + 1],
          (shipmentlogs->size - rangeE - 1) * sizeof(struct shipment));
 
-
     shipmentlogs->size -= sizeRemoved;
     int newSize = shipmentlogs->size;
-
+    //deleting extra memory
+    // Chatgtp said to use this bc,
+    // you’re filling the raw bytes that make up those struct shipment objects with zeroes.
+    // aka a ay of making them emply stucts that cna tbe used
     memset(&shipmentlogs->shipments[newSize], 0,
-       (shipmentlogs->capacity - newSize) * sizeof(struct shipment));
+           (shipmentlogs->capacity - newSize) * sizeof(struct shipment));
 
 
     //printf("AFTER\n");
     //printShipmentLogs(*shipmentlogs);
     printf("%d\n", newSize);
 
-    if ( shipmentlogs->size < (shipmentlogs->capacity) / 2) {
+
+//todo: You do a better more effcient way to split with some math in cses of mutple cap/2 being needed
+    if ( (shipmentlogs->size < (shipmentlogs->capacity) / 2 ) &&
+        shipmentlogs->capacity > initialCapacityOfArrayList) {
+
         shipmentlogs->capacity = shipmentlogs->capacity / 2;
 
         //Were deallocating the memory of the arraylist by half bc its no longer needed
@@ -137,13 +143,13 @@ void deleteShipment(struct shipmentArrayList *shipmentlogs, int rangeS, int rang
              shipmentlogs->capacity * sizeof(struct shipment)
 );
 
-
     }
 }
 void deleteShipmentMenu(struct shipmentArrayList *shipmentlogs) {
     do {
         char response[512];
         printNShipment(*shipmentlogs, printNumber);
+        printf("---------- DELETING MENU --------------");
         printf("Enter shipment index range to delete (e.g., 2-5 both inclusive), max index = %d\n", shipmentlogs->size - 1);
         printf("Or type 'exit' to return to the main menu:\n");
         scanf("%s", &response);
@@ -159,10 +165,74 @@ void deleteShipmentMenu(struct shipmentArrayList *shipmentlogs) {
                 continue;
             }
             printf("You entered: start = %d, end = %d\n", startIdx, endIdx);
+            //todo: catch those inputs aps the max
             deleteShipment(shipmentlogs, startIdx, endIdx);
             // You can now call deleteShipmentRange(shipmentlogs, startIdx, endIdx);
             // But for now, just UI
         }
+    } while (1);
+}
+void searchShipmentMenu(struct shipmentArrayList *shipmentlogs) {
+    char response[128];
+    int choice;
+
+    do {
+        printf("------ Search Menu ------\n");
+        printf("1 = Search by bamboo type\n");
+        printf("2 = Search by supplier ID\n");
+        printf("3 = Search by date range\n");
+        printf("-1 = Return to main menu\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        if (choice == -1) {
+            break;
+        }
+
+        if (choice == 1) {  // Bamboo type
+            int type;
+            printf("Enter bamboo type (0–9): ");
+            scanf("%d", &type);
+            for (int i = 0; i < shipmentlogs->size; i++) {
+                if (shipmentlogs->shipments[i].type == type) {
+                    struct shipment s = shipmentlogs->shipments[i];
+                    printf("Type: %d | Amount: %d | Date: %s | Supplier: %d\n",
+                           s.type, s.amount, s.date, s.suplierId);
+                }
+            }
+
+        } else if (choice == 2) {  // Supplier ID
+            int supplierId;
+            printf("Enter supplier ID: ");
+            scanf("%d", &supplierId);
+            for (int i = 0; i < shipmentlogs->size; i++) {
+                if (shipmentlogs->shipments[i].suplierId == supplierId) {
+                    struct shipment s = shipmentlogs->shipments[i];
+                    printf("Type: %d | Amount: %d | Date: %s | Supplier: %d\n",
+                           s.type, s.amount, s.date, s.suplierId);
+                }
+            }
+
+        } else if (choice == 3) {  // Date range
+            char startDate[11], endDate[11];
+            printf("Enter start date (YYYY-MM-DD): ");
+            scanf("%s", startDate);
+            printf("Enter end date (YYYY-MM-DD): ");
+            scanf("%s", endDate);
+
+            for (int i = 0; i < shipmentlogs->size; i++) {
+                if (strcmp(shipmentlogs->shipments[i].date, startDate) >= 0 &&
+                    strcmp(shipmentlogs->shipments[i].date, endDate) <= 0) {
+                    struct shipment s = shipmentlogs->shipments[i];
+                    printf("Type: %d | Amount: %d | Date: %s | Supplier: %d\n",
+                           s.type, s.amount, s.date, s.suplierId);
+                }
+            }
+
+        } else {
+            printf("Invalid choice, try again.\n");
+        }
+        // use chatgtp after knwoing hwo to the frist one, bc repetition
     } while (1);
 }
 
@@ -229,7 +299,7 @@ int main(int argc, char * argv[]) {
                 break;
             case 2:
                 // TODO: Call search shipments function
-                // searchShipments(&shipmentlogs);
+                searchShipmentMenu(&shipmentlogs);
                 break;
             case 3:
                 // TODO: Call remove shipments function

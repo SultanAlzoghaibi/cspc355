@@ -92,6 +92,13 @@ void addshipmentsMenu(struct shipmentArrayList *shipmentlogs){
                 int type, amount, supplierId;
                 continue;
             }
+
+            // Optional: Validate date format (basic check)
+            if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
+                printf("Warning: Invalid date format : %s" , date);
+                continue;
+            }
+
             struct shipment s;
             s.type = type;
             s.amount = amount;
@@ -302,13 +309,26 @@ void loadFile(struct shipmentArrayList *shipmentlogs, char filename[]) {
     }
     char shipmentLine[256];
     int count;
+    int lineNumber = 0;
 
     while (fgets(shipmentLine, sizeof(shipmentLine), shipmentFile) != NULL) {
-
+        lineNumber++;
         int type, amount, supplierId;
         char date[11];  // +1 for '\0'
-        sscanf(shipmentLine, "%d %d %10s %d",
-        &type, &amount, date, &supplierId);
+        int parsed = sscanf(shipmentLine, "%d %d %10s %d",
+                            &type, &amount, date, &supplierId);
+
+        // If not all fields are read correctly → show warning and skip
+        if (parsed != 4) {
+            printf("Warning: Invalid or incomplete data on line %d: %s", lineNumber, shipmentLine);
+            continue;
+        }
+
+        // Optional: Validate date format (basic check)
+        if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
+            printf("Warning: Invalid date format on line %d: %s", lineNumber, date);
+            continue;
+        }
 
         struct shipment s;
         s.type = type;

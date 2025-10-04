@@ -122,6 +122,7 @@ void deleteShipment(struct shipmentArrayList *shipmentlogs, int rangeS, int rang
     memset(&shipmentlogs->shipments[newSize], 0,
        (shipmentlogs->capacity - newSize) * sizeof(struct shipment));
 
+
     //printf("AFTER\n");
     //printShipmentLogs(*shipmentlogs);
     printf("%d\n", newSize);

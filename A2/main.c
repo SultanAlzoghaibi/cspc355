@@ -236,6 +236,62 @@ void searchShipmentMenu(struct shipmentArrayList *shipmentlogs) {
     } while (1);
 }
 
+int compareDesc(const void *a, const void *b) {
+    int A = *(int *)a;
+    int B = *(int *)b;
+    return B - A;
+}
+
+void sortShipmentMenu(struct shipmentArrayList *shipmentlogs) {
+
+
+}
+
+void generateReport(struct shipmentArrayList *shipmentlogs) {
+    FILE *reportFile = fopen("A2/report.txt", "w");
+    if (reportFile == NULL) {
+        printf("Failed to open report file.\n");
+        return;
+    }
+    int typeTotals[10] = {0};
+    int supplierTotals[1000] = {0}; // suplyer less then 1000
+    int totalQuantity = 0;
+
+    for (int i = 0; i < shipmentlogs->size; i++) {
+        struct shipment s = shipmentlogs->shipments[i];
+        typeTotals[s.type] += 1;
+        supplierTotals[s.suplierId] += s.amount;
+        totalQuantity += s.amount;
+    }
+    fprintf(reportFile, "Total bamboo stock:\n");
+    for (int i = 0; i < 10; i++) {
+        if (typeTotals[i] > 0) {
+            fprintf(reportFile, "Type %d: %d\n", i, typeTotals[i]);
+        }
+    }
+
+    fprintf(reportFile, "\n");
+    int typeTotalsCopy[10] = {0};
+    memcpy(typeTotalsCopy, typeTotals, sizeof(typeTotals));
+    qsort(typeTotalsCopy, 10, sizeof(int), compareDesc);
+    fprintf(reportFile, "Top 3 bambo types:\n");
+    for (int i = 0; i < 3; i++) {
+        fprintf(reportFile, "%d. %d ", i+1, typeTotalsCopy[i]);
+    }
+    fprintf(reportFile, "\n");
+    fprintf(reportFile, "\nSupplier statistics:\n");
+    for (int i = 0; i < 1000; i++) {
+        if (supplierTotals[i] > 0) {
+            float percent = ((float)supplierTotals[i] / totalQuantity) * 100.0f;
+            fprintf(reportFile, "Supplier %d: %.1f%%\n", i, percent);
+        }
+    }
+
+    fclose(reportFile);
+    printf("✅ Report generated successfully: report.txt\n");
+
+}
+
 
 
 void loadFile(struct shipmentArrayList *shipmentlogs, char filename[]) {
@@ -287,7 +343,7 @@ int main(int argc, char * argv[]) {
         printf("------ You are at the Home Menu ------\n");
         printf("First 5 shipments in shipmentlogs \n");
         printNShipment(shipmentlogs, printNumber);
-        printf("Which menu to go to: 1 = add ships, 2 = search ships, 3 = remove ships, 4 = sort ships, -1 = exit: \n");
+        printf("Which menu to go to: 1 = add ships, 2 = search ships, 3 = remove ships, 4 = sort ships, 4 = generate report, -1 = exit: \n");
 
         int choice;
         scanf("%d", &choice);
@@ -309,6 +365,9 @@ int main(int argc, char * argv[]) {
             case 4:
                 // TODO: Call sort shipments function
                 // sortShipments(&shipmentlogs);
+                break;
+            case 5:
+                generateReport(&shipmentlogs);
                 break;
             case -1:
                 // Exit menu loop

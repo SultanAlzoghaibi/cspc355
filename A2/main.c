@@ -1,10 +1,11 @@
 //
 // Created by Sultan Alzoghaibi on 2025-09-30.
-//
+// A2:
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 int initialCapacityOfArrayList = 32;
 int printNumber = 10;
@@ -50,6 +51,47 @@ void printNShipment(struct shipmentArrayList shipmentlogs, int n) {
 }
 
 
+int daysBetween(const char *date1, const char *date2) {
+    struct tm d1 = {0}, d2 = {0};
+
+    // Parse "YYYY-MM-DD"
+    if (sscanf(date1, "%d-%d-%d", &d1.tm_year, &d1.tm_mon, &d1.tm_mday) != 3) {
+        return 0;  // parse error
+    }
+    if (sscanf(date2, "%d-%d-%d", &d2.tm_year, &d2.tm_mon, &d2.tm_mday) != 3) {
+        return 0;
+    }
+
+    // Adjust for struct tm format
+    d1.tm_year -= 1900;
+    d2.tm_year -= 1900;
+    d1.tm_mon  -= 1;
+    d2.tm_mon  -= 1;
+
+    // Let mktime figure out DST
+    d1.tm_isdst = -1;
+    d2.tm_isdst = -1;
+
+    time_t t1 = mktime(&d1);
+    time_t t2 = mktime(&d2);
+
+    if (t1 == (time_t)-1 || t2 == (time_t)-1) {
+        // error converting
+        return 0;
+    }
+
+    double secondsDiff = difftime(t2, t1);
+    double days = secondsDiff / (60 * 60 * 24);
+
+    // Round to nearest integer day
+    if (days >= 0)
+        return (int)(days + 0.5);
+    else
+        return (int)(days - 0.5);
+}
+// got help with chatgt withe library of #include <time.h> and implimantation
+
+
 void addShipment(struct shipmentArrayList *shipmentlogs, struct shipment shipment) {
     int addIdx = (shipmentlogs->size);
 
@@ -72,7 +114,7 @@ void addShipment(struct shipmentArrayList *shipmentlogs, struct shipment shipmen
 
 }
 
-void addshipmentsMenu(struct shipmentArrayList *shipmentlogs){
+void addshipmentsMenu(struct shipmentArrayList *shipmentlogs, char todayDate[] ){
     do {
         char response[512];
         printf("Enter shipment (<type> <amount> <date> <supplier>) OR 'exit' to break: \n");
@@ -93,11 +135,25 @@ void addshipmentsMenu(struct shipmentArrayList *shipmentlogs){
                 continue;
             }
 
+
             // Optional: Validate date format (basic check)
             if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
                 printf("Warning: Invalid date format : %s" , date);
                 continue;
             }
+            int daysPassed = daysBetween(date, todayDate);
+
+            // Skip expired (older than 7 days)
+            if (daysPassed > 7) {
+                printf("❌ Skipping expired shipment (Type %d, Date %s)\n", type, date);
+                continue;
+            }
+
+            // Warn if expiring within 2 days
+            if (daysPassed >= 5) {
+                printf("⚠️  Warning: Shipment (Type %d, Date %s) expires soon!\n", type, date);
+            }
+
 
             struct shipment s;
             s.type = type;
@@ -250,6 +306,77 @@ int compareDesc(const void *a, const void *b) {
 }
 
 void sortShipmentMenu(struct shipmentArrayList *shipmentlogs) {
+    int choice;
+    do {
+        printf("\n------ Sort Menu ------\n");
+        printf("1 = Sort by Quantity\n");
+        printf("2 = Sort by Bamboo Type\n");
+        printf("3 = Sort by Date\n");
+        printf("-1 = Exit Sort Menu\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                for (int i = 1; i < shipmentlogs->size; ++i) {
+                    struct shipment s = shipmentlogs->shipments[i];
+                    int j = i - 1;
+
+                    /* Move elements of arr[0..i-1], that are
+                       greater than key, to one position ahead
+                       of their current position */
+                    while (j >= 0 &&  shipmentlogs->shipments[j].amount < s.amount) {
+                        shipmentlogs->shipments[j + 1] = shipmentlogs->shipments[j];
+                        j -= 1;
+                    }
+                    shipmentlogs->shipments[j + 1] = s;
+                }
+                // source but replaced with variable with my own
+                // https://www.geeksforgeeks.org/dsa/insertion-sort-algorithm/
+
+
+                printf("✅ Sorted by Quantity (high → low)\n");
+                break;
+            case 2:
+                for (int i = 1; i < shipmentlogs->size; ++i) {
+                    struct shipment s = shipmentlogs->shipments[i];
+                    int j = i - 1;
+
+                    /* Move elements of arr[0..i-1], that are
+                       greater than key, to one position ahead
+                       of their current position */
+                    while (j >= 0 &&  shipmentlogs->shipments[j].type > s.type) {
+                        shipmentlogs->shipments[j + 1] = shipmentlogs->shipments[j];
+                        j -= 1;
+                    }
+                    shipmentlogs->shipments[j + 1] = s;
+                }
+
+                printf("✅ Sorted by Bamboo Type\n");
+                break;
+            case 3:
+
+                for (int i = 1; i < shipmentlogs->size; i++) {
+                    struct shipment key = shipmentlogs->shipments[i];
+                    int j = i - 1;
+
+                    // Compare date strings lexicographically
+                    while (j >= 0 && strcmp(shipmentlogs->shipments[j].date, key.date) > 0) {
+                        shipmentlogs->shipments[j + 1] = shipmentlogs->shipments[j];
+                        j--;
+                    }
+                    shipmentlogs->shipments[j + 1] = key;
+                }
+
+                printf("✅ Sorted by Date (newest first)\n");
+                break;
+            case -1:
+                printf("🔙 Returning to main menu...\n");
+                return; // exits the function
+            default:
+                printf("❌ Invalid choice. Please try again.\n");
+        }
+
+    } while (1);
 
 
 }
@@ -301,7 +428,7 @@ void generateReport(struct shipmentArrayList *shipmentlogs) {
 
 
 
-void loadFile(struct shipmentArrayList *shipmentlogs, char filename[]) {
+void loadFile(struct shipmentArrayList *shipmentlogs, char filename[], char todayDate[]) {
     FILE *shipmentFile = fopen(filename, "r");
     if (shipmentFile == NULL) {
         printf("File not found\n");
@@ -318,17 +445,31 @@ void loadFile(struct shipmentArrayList *shipmentlogs, char filename[]) {
         int parsed = sscanf(shipmentLine, "%d %d %10s %d",
                             &type, &amount, date, &supplierId);
 
+
         // If not all fields are read correctly → show warning and skip
         if (parsed != 4) {
             printf("Warning: Invalid or incomplete data on line %d: %s", lineNumber, shipmentLine);
             continue;
         }
 
+
         // Optional: Validate date format (basic check)
         if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
             printf("Warning: Invalid date format on line %d: %s", lineNumber, date);
             continue;
         }
+        int daysPassed = daysBetween(date, todayDate);
+
+        if (daysPassed > 7) {
+            printf("❌ Skipping expired shipment (Type %d, Date %s)\n", type, date);
+            continue;
+        }
+
+        if (daysPassed >= 5) {
+            printf("⚠️  Warning: Shipment (Type %d, Date %s) expires soon!\n", type, date);
+        }
+
+
 
         struct shipment s;
         s.type = type;
@@ -345,6 +486,8 @@ void loadFile(struct shipmentArrayList *shipmentlogs, char filename[]) {
 }
 
 
+
+
 // -----------------MAIN---------MAIN------MAIN-----MAIN-------MAIN----------------------------------------------
 int main(int argc, char * argv[]) {
     if (argc != 2) {
@@ -355,9 +498,20 @@ int main(int argc, char * argv[]) {
     struct shipmentArrayList shipmentlogs;
     initShipmentArrayList(&shipmentlogs, initialCapacityOfArrayList);
 
+    char todayDate[11];
+    do {
+        printf("Enter today's date (YYYY-MM-DD): ");
+        scanf("%10s", todayDate);
+        if (strlen(todayDate) != 10 || todayDate[4] != '-' || todayDate[7] != '-') {
+            printf("Warning: Invalid date format)");
+            continue;
+        }
+        break;
+    } while (1);
+
     char *fileName = argv[1];
     printf("%s\n", fileName);
-    loadFile(&shipmentlogs, fileName);
+    loadFile(&shipmentlogs, fileName, todayDate);
     //printShipmentLogs(shipmentlogs);
     do {
         printf("------ You are at the Home Menu ------\n");
@@ -371,7 +525,7 @@ int main(int argc, char * argv[]) {
         switch (choice) {
             case 1:
                 // Call function to add shipments
-                addshipmentsMenu(&shipmentlogs);
+                addshipmentsMenu(&shipmentlogs, todayDate);
                 break;
             case 2:
                 // TODO: Call search shipments function
@@ -384,7 +538,7 @@ int main(int argc, char * argv[]) {
                 break;
             case 4:
                 // TODO: Call sort shipments function
-                // sortShipments(&shipmentlogs);
+                sortShipmentMenu(&shipmentlogs);
                 break;
             case 5:
                 generateReport(&shipmentlogs);

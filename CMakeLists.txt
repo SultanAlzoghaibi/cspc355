@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD 11)
 add_executable(A1
         A1/main1.c
         copy.c
+        midtermprerp/test.c
 )
 
 # Assignment 2 target

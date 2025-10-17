@@ -1,6 +1,13 @@
 //
 // Created by Sultan Alzoghaibi on 2025-09-30.
 // A2:
+/*
+ * Im using an Arraylist where if theer need to more space
+ * it will double in size Similar ot how is
+ * Arraylist in Java (1.5x)
+ * or list in python work (~1.125–1.5× depending on size.)
+ *
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -116,54 +123,79 @@ void addShipment(struct shipmentArrayList *shipmentlogs, struct shipment shipmen
 
 void addshipmentsMenu(struct shipmentArrayList *shipmentlogs, char todayDate[] ){
     do {
-        char response[512];
-        printf("Enter shipment (<type> <amount> <date> <supplier>) OR 'exit' to break: \n");
-        scanf("%s", &response);
-        response[strcspn(response, "\n")] = '\0';
+        char command[16];
+        printf("\nEnter 'add' to input a new shipment or 'exit' to return to main menu: ");
+        scanf("%15s", command);
 
-        if (strcmp(response, "exit") == 0) {
+        if (strcmp(command, "exit") == 0)
             break;
-        } else {
-            if (fgets(response, sizeof(response), stdin) == NULL) break;
-            int type, amount, supplierId;
-            char date[11];
-            int fileReadnum = sscanf(response, "%d %d %10s %d", &type, &amount, date, &supplierId);
-
-            if (fileReadnum != 4) {
-                printf("Invalid input\n");
-                int type, amount, supplierId;
-                continue;
-            }
-
-
-            // Optional: Validate date format (basic check)
-            if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
-                printf("Warning: Invalid date format : %s" , date);
-                continue;
-            }
-            int daysPassed = daysBetween(date, todayDate);
-
-            // Skip expired (older than 7 days)
-            if (daysPassed > 7) {
-                printf("❌ Skipping expired shipment (Type %d, Date %s)\n", type, date);
-                continue;
-            }
-
-            // Warn if expiring within 2 days
-            if (daysPassed >= 5) {
-                printf("⚠️  Warning: Shipment (Type %d, Date %s) expires soon!\n", type, date);
-            }
-
-
-            struct shipment s;
-            s.type = type;
-            s.amount = amount;
-            s.suplierId = supplierId;
-            strcpy(s.date, date);
-
-            addShipment(&shipmentlogs, s);
-            printf("Shipment added successfully\n");
+        if (strcmp(command, "add") != 0) {
+            printf("❌ Invalid command. Type 'add' or 'exit'.\n");
+            continue;
         }
+
+        int type, amount, supplierId;
+        char date[11];
+
+        printf("Enter bamboo type (integer 0–9): ");
+        if (scanf("%d", &type) != 1) {
+            printf("❌ Invalid type input.\n");
+            while (getchar() != '\n'); // flush bad input
+            continue;
+        }
+
+        printf("Enter shipment amount: ");
+        if (scanf("%d", &amount) != 1) {
+            printf("❌ Invalid amount input.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        printf("Enter shipment date (YYYY-MM-DD): ");
+        scanf("%10s", date);
+
+        // Validate date format
+        if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
+            printf("⚠️ Invalid date format: %s\n", date);
+            continue;
+        }
+        int year, month, day;
+        if (sscanf(date, "%4d-%2d-%2d", &year, &month, &day) != 3 ||
+            month < 1 || month > 12 || day < 1 || day > 31) {
+            printf("⚠️ Invalid date value: %s\n", date);
+            continue;
+            }
+
+        printf("Enter supplier ID: ");
+        if (scanf("%d", &supplierId) != 1) {
+            printf("❌ Invalid supplier input.\n");
+            while (getchar() != '\n');
+            continue;
+        }
+
+        int daysPassed = daysBetween(date, todayDate);
+
+        // Skip expired (older than 7 days)
+        if (daysPassed > 7) {
+            printf("❌ Skipping expired shipment (Type %d, Date %s)\n", type, date);
+            continue;
+        }
+
+        // Warn if expiring within 2 days
+        if (daysPassed >= 5) {
+            printf("⚠️  Warning: Shipment (Type %d, Date %s) expires soon!\n", type, date);
+        }
+
+
+        struct shipment s;
+        s.type = type;
+        s.amount = amount;
+        s.suplierId = supplierId;
+        strcpy(s.date, date);
+
+        addShipment(shipmentlogs, s);
+        printf("Shipment added successfully\n");
+
     } while (1);
 }
 
@@ -410,7 +442,7 @@ void generateReport(struct shipmentArrayList *shipmentlogs) {
     qsort(typeTotalsCopy, 10, sizeof(int), compareDesc);
     fprintf(reportFile, "Top 3 bambo types:\n");
     for (int i = 0; i < 3; i++) {
-        fprintf(reportFile, "%d. %d ", i+1, typeTotalsCopy[i]);
+        fprintf(reportFile, "%d. %d \n", i+1, typeTotalsCopy[i]);
     }
     fprintf(reportFile, "\n");
     fprintf(reportFile, "\nSupplier statistics:\n");
@@ -448,17 +480,28 @@ void loadFile(struct shipmentArrayList *shipmentlogs, char filename[], char toda
 
         // If not all fields are read correctly → show warning and skip
         if (parsed != 4) {
-            printf("Warning: Invalid or incomplete data on line %d: %s", lineNumber, shipmentLine);
+            printf("WARNING ⚠️ : Invalid or incomplete data on line %d: %s \n", lineNumber, shipmentLine);
             continue;
         }
 
 
         // Optional: Validate date format (basic check)
         if (strlen(date) != 10 || date[4] != '-' || date[7] != '-') {
-            printf("Warning: Invalid date format on line %d: %s", lineNumber, date);
+            printf("Warning ⚠️: Invalid date format on line %d: %s", lineNumber, date);
             continue;
         }
+
+        int year, month, day;
+        sscanf(date, "%4d-%2d-%2d", &year, &month, &day);
+
+        // Simple bounds check
+        if (month < 1 || month > 12 || day < 1 || day > 31) {
+            printf("⚠️ Warning: Invalid date value on line %d: %s\n", lineNumber, date);
+            continue;
+        }
+
         int daysPassed = daysBetween(date, todayDate);
+
 
         if (daysPassed > 7) {
             printf("❌ Skipping expired shipment (Type %d, Date %s)\n", type, date);
@@ -502,6 +545,7 @@ int main(int argc, char * argv[]) {
     do {
         printf("Enter today's date (YYYY-MM-DD): ");
         scanf("%10s", todayDate);
+        //strcpy(todayDate, "2025-10-05");
         if (strlen(todayDate) != 10 || todayDate[4] != '-' || todayDate[7] != '-') {
             printf("Warning: Invalid date format)");
             continue;
@@ -515,9 +559,9 @@ int main(int argc, char * argv[]) {
     //printShipmentLogs(shipmentlogs);
     do {
         printf("------ You are at the Home Menu ------\n");
-        printf("First 5 shipments in shipmentlogs \n");
+        printf("First 10 shipments in shipmentlogs \n");
         printNShipment(shipmentlogs, printNumber);
-        printf("Which menu to go to: 1 = add ships, 2 = search ships, 3 = remove ships, 4 = sort ships, 4 = generate report, -1 = exit: \n");
+        printf("Which menu to go to: 1 = add ships, 2 = search ships, 3 = remove ships, 4 = sort ships, 5 = generate report, -1 = exit: \n");
 
         int choice;
         scanf("%d", &choice);
@@ -528,16 +572,13 @@ int main(int argc, char * argv[]) {
                 addshipmentsMenu(&shipmentlogs, todayDate);
                 break;
             case 2:
-                // TODO: Call search shipments function
                 searchShipmentMenu(&shipmentlogs);
                 break;
             case 3:
-                // TODO: Call remove shipments function
                 deleteShipmentMenu(&shipmentlogs);
 
                 break;
             case 4:
-                // TODO: Call sort shipments function
                 sortShipmentMenu(&shipmentlogs);
                 break;
             case 5:

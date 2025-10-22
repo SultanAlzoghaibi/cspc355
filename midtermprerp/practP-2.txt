@@ -1,0 +1,155 @@
+a. ADD W0, W1, W2
+yes, its adding W0 = W1 + W2
+
+b. ADD X5, X6, #0x1FFFF0000
+yes its adding X5 = X5 + X6( memory address)
+
+CPSC 355
+
+1. Indicate whether each of the following ARMv8 instructions is valid. If invalid, briefly
+explain why.
+a. ADD W0, W1, W2
+b. ADD X5, X6, #0x1FFFF0000
+
+c. ADDS W3, W3, #-5
+Valid
+
+
+d. SUBS W8, W9, W10, LSL #1
+valid, in the squence it would be like such
+w8 = w9 - (w10 * 2)
+
+e. SUB X0, XZR, X1
+valid, X0 = 0 - X1
+
+f. INC W2
+invalid, does not exist in assembly
+
+g. DEC X3
+invalid, does not exist in assembly
+
+h. ADDS W4, W4, W4, LSR #32
+Invalid, (shift amount must be < register width)
+only 0-31 is acceptable
+
+i. ADD X7, X7, #0xFFFFFFFFFFFFFFFF
+invalid, 0xFFFFFFFFFFFFFFFF is bigger then 64 bits
+
+j. SUB W0, W0, #256
+valid, under the limit of #n
+
+k. ADDS W1, W1, #-128
+valid
+
+l. SUBS X2, X2, X2
+valid, always = 0 tho
+
+
+-------------------2.------------------------
+
+2. Determine the Carry (C) flag after each sequence.
+a.
+MOV W0, #0xFFFFFFFF
+ADDS W0, W0, #1
+C = 1, bit overflow
+
+b. MOV W1, #2
+SUBS W1, W1, #2
+C = 1, bc no borrowing is taking place
+
+
+
+c. MOV W2, #0
+SUBS W2, W2, #1
+c = 0, bc we need to borrow a 1 to make things negatve
+
+d. MOV W3, #0xDF
+ADDS W3, W3, #0x32
+c = 0, less then overflow limit of 32 bits
+
+e. MOV W4, #0xB9F6
+SUBS W4, W4, #0x9874
+c = 1, no borrowing needed
+
+f. MOV W5, #0x695F
+SUBS W5, W5, #0xA218
+C = 0 (Borrow occurs since 0x695F < 0xA218)
+
+
+flag is Zero        -> Z = 1
+flag is NOT Zero    -> Z = 0
+
+3. Determine the Zero (Z) flag after each sequence.
+a. MOV W0, #0xFFFFFFFF
+ADDS W0, W0, #1
+X = 1
+
+
+b. MOV W1, #2
+SUBS W1, W1, #2
+Z = 1
+
+c. MOV W2, #0
+SUBS W2, W2, #1
+ans = 0xFFFFFFFF
+Z = 0
+
+d. MOV W3, #0xDF
+ADDS W3, W3, #0x32
+Z = 0
+
+e. MOV W4, #0xB9F6
+SUBS W4, W4, #0x9874
+Z = 0
+
+f. MOV W5, #0x695F
+SUBS W5, W5, #0xA218
+Z = 0
+
+
+N = 1 → The result is negative
+N = 0 → The result is non-negative (≥ 0)
+4. Determine the Negative (N) flag after each sequence.
+a. MOV W0, #0xFFFF
+SUBS W0, W0, #1
+N = 0
+
+b. MOV W1, #2
+SUBS W1, W1, #3
+N = 1
+
+c. MOV W2, #0
+SUBS W2, W2, #1
+N = 1
+
+d. MOV W0, #0x7FFE
+ADDS W0, W0, #0x22
+N = 0
+
+e. MOV W4, #0xB9F6
+SUBS W4, W4, #0x9874
+N = 0
+
+f. MOV W5, #0x8000
+ADDS W5, W5, #0xA69F
+N = 0
+
+
+
+5. For each sequence, determine the indicated flags (C, N, Z, V).
+a. MOV W0, #0x0620
+SUBS W0, W0, #0xF6
+(C, N, Z, V)
+(C, N, Z, V)
+
+
+b. MOV W0, #0x0720
+SUBS W0, W0, #0xE6
+c. MOV W0, #0xB6D4
+ADDS W0, W0, #0xB3
+d. MOV W1, #-127
+SUBS W1, W1, #1
+e. MOV W2, #-4097
+ADDS W2, W2, #0x1001
+f. MOV W3, #-56
+ADDS W3, W3, #-6

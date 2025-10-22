@@ -1,6 +1,8 @@
 
 #include <stdio.h>;
 
+#include <stdio.h>;
+
 
 int fib() {
 // 0, 1, 1, 2, 3, 5, 8, 13...
@@ -54,8 +56,67 @@ int isPrime() {
     return 0;
 }
 
+
+int secondLargest() {
+    int n = 5;
+    int arr[5] = { 1, 2, 3, 4, 5};
+
+    int largest = -21771777;
+    int secondLargest = -21771777;
+    if (n <= 1) {
+        printf("there is no second largest");
+        return 0;
+    }
+    for (int i = 0; i < n; i++) {
+
+        if (arr[i] >= largest) {
+            int temp = largest;
+            largest = arr[i];
+            secondLargest = temp;
+        }
+        else if ( arr[i] > secondLargest) {
+            secondLargest = arr[i];
+        }
+
+    }
+    printf("Second largest element is %d\n", secondLargest);
+    return 0;
+
+
+}
+int allElements() {
+    int arrSize;
+    printf("enter a num for arrSize");
+    scanf("%d", &arrSize);
+    int n;
+    int arr[n];
+
+    for (int i = 0; i < arrSize; i++) {
+        printf("enter a num at index %d", i);
+
+        scanf("%d", &n);
+        arr[i] = n;
+    }
+
+}
+int allElements2() {
+
+    int arr[] = {1,2,3,5};
+    int *ptr = arr;
+    int total = 0;
+    for (int i = 0; i < 4; i++) {
+        total += *(ptr + i);
+    }
+    printf("Sum: %d", total);
+
+    return 0;
+}
+
+
+in
 int main() {
-    fib();
+    allElements2();
+
 
 
 

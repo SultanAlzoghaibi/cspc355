@@ -1,0 +1,47 @@
+
+
+
+1. Write an ARMv8 program that clears the lower 4 bits of X0 and stores the result in X1.
+Hint: Use AND with a suitable mask.
+
+AND x0, x0, 0xFFFFFFFFFFFFFFF0
+
+2. Write a program to set bits 3, 5, and 7 of X1 without changing other bits. Store the result
+in X2.
+ORR X2, X1, #0xA8 // 0xA8 = 10101000b → sets bits 3,5,7
+
+Hint: Use ORR with a mask.
+
+3. Write a program to toggle bits 0, 2, and 4 of X2 and store the result in X3.
+Hint: Use EOR instruction.
+EOR
+EOR X3, X2, #0x15 // 0x15 = 00010101b → toggles bits 0,2,4
+
+
+4. Write a program to store the bitwise NOT of X3 into X4.
+Hint: Use MVN.
+MVN X4, X3
+
+5. Write a program that extracts all even-numbered bits (0, 2, 4, ...) of X0 and stores the
+result in X5.
+Hint: Use AND with a proper mask.
+AND X5, X0, #0x5555555555555555 // Mask even bits (0,2,4,...
+5 = 5 = 5/2 =   2 1
+                1 0
+                0 1
+                add 0 from 4 bits
+
+6. Write a program to combine two registers X0 and X1 such that X6 contains bits that are
+set in either X0 or X1 but not both.
+Hint: Use EOR.
+
+7. Write a program to clear the high nibble (bits 60–63) of X7 and store the result in X8.
+Hint: Use AND with mask 0x0FFFFFFFFFFFFFFF.
+8. Assume X9 contains a flag in bit 3. If the flag is set, set bits 0–2 in X10; otherwise, leave
+X10 unchanged.
+Hint: Use AND, ORR, and conditional execution.
+9. Write a program to swap odd and even bits of X11 and store in X12.
+Hint: Use masks and shifts combined with ORR or EOR.
+10. Write a program to invert bits 8–15 of X13 and leave other bits unchanged, storing the
+result in X14.
+Hint: Use EOR with a mask

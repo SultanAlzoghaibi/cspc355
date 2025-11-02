@@ -1,0 +1,10 @@
+m4 assign2b.arm > assign2b.s
+as -o assign2b.o assign2b.s
+gcc -o assign2b assign2b.o
+./assign2b
+Enter N: 3
+Random: 45
+Random: 120
+Random: 230
+Total sum: 395
+Array is sorted in ascending order.

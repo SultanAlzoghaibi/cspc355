@@ -1,0 +1,30 @@
+as -o assign2a.o assign2a.s
+gcc -o assign2a assign2a.o
+
+./assign2a
+Enter N: 0
+Invalid input. N must be positive.
+
+./assign2a
+Enter N: 2
+Random: 45
+Random: 112
+Total sum: 157
+Array is sorted in ascending order.
+
+./assign2a
+Enter N: 3
+Random: 210
+Random: 140
+Random: 90
+Total sum: 440
+Array is sorted in descending order.
+
+./assign2a
+Enter N: 4
+Random: 55
+Random: 190
+Random: 88
+Random: 200
+Total sum: 533
+Array is not sorted.

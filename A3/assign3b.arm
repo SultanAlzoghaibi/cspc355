@@ -1,0 +1,134 @@
+.global main
+.extern printf, scanf, rand, srand, time
+
+dnl ----------------------------------------
+dnl Macros for readability
+dnl ----------------------------------------
+define(`CNT', `w19')
+define(`TOTAL', `x21')
+define(`ASC', `w23')
+define(`DESC', `w24')
+define(`PREV', `w25')
+define(`CURR', `w22')
+define(`LIMIT', `w20')
+
+.data
+.align 4
+
+prompt:      .asciz "Enter N: "
+fmt:         .asciz "%d"
+N:           .word 0
+msg:         .asciz "Random: %d\n"
+totalmsg:    .asciz "Total sum: %d\n"
+ascmsg:      .asciz "Array is sorted in ascending order.\n"
+descmsg:     .asciz "Array is sorted in descending order.\n"
+unsortedmsg: .asciz "Array is not sorted.\n"
+errmsg:      .asciz "Invalid input. N must be positive.\n"
+
+.text
+main:
+        adrp x0, prompt
+        add  x0, x0, :lo12:prompt
+        bl printf
+
+        adrp x0, fmt
+        add  x0, x0, :lo12:fmt
+        adrp x1, N
+        add  x1, x1, :lo12:N
+        bl scanf
+
+        adrp x1, N
+        add  x1, x1, :lo12:N
+        ldr LIMIT, [x1]
+
+        cmp LIMIT, #0              // check if N <= 0
+        ble invalid_input          // branch if invalid
+
+        mov x0, #0
+        bl time
+        bl srand
+
+        mov CNT, #0
+        mov TOTAL, #0
+        mov ASC, #0
+        mov DESC, #0
+        mov PREV, #-1
+
+loop:
+        bl rand
+        mov CURR, w0
+        and CURR, CURR, #0xFF
+
+        cmp PREV, #-1
+        beq skip_compare
+
+        cmp CURR, PREV
+        b.gt mark_ascending
+        b.lt mark_descending
+
+skip_compare:
+        adrp x0, msg
+        add  x0, x0, :lo12:msg
+        mov  w1, CURR
+        bl printf
+
+        add TOTAL, TOTAL, CURR, sxtw
+        mov PREV, CURR
+        add CNT, CNT, #1
+
+        cmp CNT, LIMIT
+        b.lt loop
+
+        adrp x0, totalmsg
+        add  x0, x0, :lo12:totalmsg
+        mov  x1, TOTAL
+        bl printf
+
+        cmp ASC, #1
+        beq check_descending
+        b check_if_descending_only
+
+check_descending:
+        cmp DESC, #1
+        beq not_sorted
+        b ascending_only
+
+check_if_descending_only:
+        cmp DESC, #1
+        beq descending_only
+        b not_sorted
+
+ascending_only:
+        adrp x0, ascmsg
+        add  x0, x0, :lo12:ascmsg
+        bl printf
+        b done
+
+descending_only:
+        adrp x0, descmsg
+        add  x0, x0, :lo12:descmsg
+        bl printf
+        b done
+
+not_sorted:
+        adrp x0, unsortedmsg
+        add  x0, x0, :lo12:unsortedmsg
+        bl printf
+        b done
+
+invalid_input:
+        adrp x0, errmsg
+        add  x0, x0, :lo12:errmsg
+        bl printf
+	
+done:
+        mov x0, #0
+        ret
+
+mark_ascending:
+        mov ASC, #1
+        b skip_compare
+
+mark_descending:
+        mov DESC, #1
+        b skip_compare

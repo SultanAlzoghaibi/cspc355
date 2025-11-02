@@ -1,16 +1,24 @@
-Double search for bamboo types 3 and 4
-(0,2) -> type 3
-(1,2) -> type 4
-(2,0) -> type 3
-(3,3) -> type 3
-Bamboo 3 percentage: 18.75%
-Bamboo 4 percentage: 6.25%
+Forest grid (4x4):
+7 9 3 8 
+0 2 4 8 
+3 9 0 5 
+2 2 7 3 
 
-Double search for bamboo types 3 and 4
-(0,2) -> type 3
-(1,2) -> type 4
-(2,0) -> type 3
-(3,3) -> type 3
-Bamboo 3 percentage: 18.75%
-Bamboo 4 percentage: 6.25%
+Search for bamboo type 8
+(0,3)
+(1,3)
+Percentage: 12.50%
 
+attempt 2 
+Forest grid (4x4):
+7 9 3 8 
+0 2 4 8 
+3 9 0 5 
+2 2 7 3 
+
+Search for bamboo type 9
+(0,1)
+(2,1)
+Percentage: 12.50%
+
+attempt 2 
